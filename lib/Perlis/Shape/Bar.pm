@@ -15,4 +15,10 @@ sub initial_coords {
     ];
 }
 
+sub id {
+    my ($self) = @_;
+
+    return 3;
+}
+
 1;

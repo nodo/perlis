@@ -26,8 +26,12 @@ sub draw {
         my $c = $coord->[0];
         my $r = $coord->[1];
 
-        $self->{grid}->[$r]->[$c] = 1;
+        if ($self->{grid}->[$r]->[$c] != 0) {
+            return 0;
+        }
+        $self->{grid}->[$r]->[$c] = $self->id;
     }
+    return 1;
 }
 
 sub down {

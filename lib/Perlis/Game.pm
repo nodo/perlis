@@ -10,6 +10,7 @@ use Perlis::Shape;
 use Perlis::Shape::Box;
 use Perlis::Shape::Bar;
 use Perlis::Shape::L;
+use Perlis::Shape::T;
 
 sub new {
     my ( $class, $columns, $rows ) = @_;
@@ -43,53 +44,30 @@ sub add_shape {
         $self->{active} = undef;
     }
 
-    my %shapes = (
-        'Perlis::Shape::Bar' => 1,
-        'Perlis::Shape::Box' => 1,
-        'Perlis::Shape::L' => 1,
-
+    my @shapes = (
+        'Perlis::Shape::Bar',
+        'Perlis::Shape::Box',
+        'Perlis::Shape::L',
+        'Perlis::Shape::T',
     );
-    my @keys = keys(%shapes);
-    my $shape_type = $keys[0];
-    my $shape = eval "$shape_type->new( \$self->{grid} )";
-    # Perlis::Shape::Box->new( $self->{grid} );
-    # }
+    my $shape_type = $shapes[rand(@shapes)];
+    my $shape      = eval "$shape_type->new( \$self->{grid} )";
     $self->{active} = $shape;
-
-}
-
-sub show {
-    my ($self) = @_;
-
-    say "\033[2J\033[H";
-    say '-' x ($self->{columns}*2);
-    foreach ( @{ $self->{grid} } ) {
-        say '|'.join( ' ', map { $_ == 0 ? ' ' : 'X' } @$_ ).'|';
-    }
-    say '-' x ($self->{columns}*2);
+    return $shape->draw();
 }
 
 sub tick {
     my ($self) = @_;
 
-    $self->{previous_state} = _hash_state($self->{grid});
     my $success = $self->apply_gravity();
     if ( !$success ) {
-        $self->add_shape();
+        my $added = $self->add_shape();
+        return 0 if !$added;
     }
     $self->clear();
     $self->draw_shapes();
 
-    return 0 if $self->end_of_game();
     return 1;
-}
-
-
-sub end_of_game {
-    my ($self) = @_;
-
-    my $new_state_hash = _hash_state($self->{grid});
-    return $self->{previous_state} eq $new_state_hash;
 }
 
 sub draw_shapes {
@@ -117,17 +95,6 @@ sub apply_gravity {
     my $active_shape = $self->{active};
     my $success      = $active_shape->down();
     return $success;
-}
-
-sub _hash_state {
-    my ($grid) = @_;
-
-    my $str;
-    foreach my $row (@$grid) {
-        $str .= join('', @$row);
-    }
-
-    return $str;
 }
 
 1;
