@@ -48,11 +48,43 @@ sub down {
         }
         push( @$new_coords, $new_coord );
     }
-
-    # If you are here none of the new coordinates collide
-    # with borders or frozen shapes. You are good to go.
     $self->{coords} = $new_coords;
+    return 1;
+}
 
+sub left {
+    my ($self) = @_;
+
+    my $new_coords;
+    foreach my $coord ( $self->{coords}->@* ) {
+        my $c = $coord->[0];
+        my $r = $coord->[1];
+
+        my $new_coord = [ $c-1, $r ];
+        if ( $self->_collision($new_coord) ) {
+            return 0;
+        }
+        push( @$new_coords, $new_coord );
+    }
+    $self->{coords} = $new_coords;
+    return 1;
+}
+
+sub right {
+    my ($self) = @_;
+
+    my $new_coords;
+    foreach my $coord ( $self->{coords}->@* ) {
+        my $c = $coord->[0];
+        my $r = $coord->[1];
+
+        my $new_coord = [ $c+1, $r ];
+        if ( $self->_collision($new_coord) ) {
+            return 0;
+        }
+        push( @$new_coords, $new_coord );
+    }
+    $self->{coords} = $new_coords;
     return 1;
 }
 

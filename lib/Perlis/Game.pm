@@ -42,13 +42,11 @@ sub add_shape {
     if ( $self->{active} ) {
         push @{ $self->{frozen_shapes} }, $self->{active};
         $self->{active} = undef;
-    }
-
-    my @shapes = (
+    } my @shapes = (
         'Perlis::Shape::Bar',
         'Perlis::Shape::Box',
         'Perlis::Shape::L',
-        'Perlis::Shape::T',
+        # 'Perlis::Shape::T',
     );
     my $shape_type = $shapes[rand(@shapes)];
     my $shape      = eval "$shape_type->new( \$self->{grid} )";
@@ -59,6 +57,11 @@ sub add_shape {
 sub tick {
     my ($self) = @_;
 
+    if ($self->{listener}) {
+        my $key = $self->{listener}->read_key();
+        $self->dispatch($key) if defined $key;
+    }
+
     my $success = $self->apply_gravity();
     if ( !$success ) {
         my $added = $self->add_shape();
@@ -68,6 +71,23 @@ sub tick {
     $self->draw_shapes();
 
     return 1;
+}
+
+sub attach_listener {
+    my ($self, $listener) = @_;
+
+    $self->{listener} = $listener;
+
+}
+
+sub dispatch {
+    my ($self, $key) = @_;
+
+    if ($key eq "a") {
+        $self->{active}->left;
+    } elsif ($key eq "d") {
+        $self->{active}->right;
+    }
 }
 
 sub draw_shapes {
