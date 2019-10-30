@@ -26,14 +26,6 @@ while (1) {
         say 'You lost.';
         exit 0;
     }
-    read_key();
     Perlis::CLIRenderer::do($game);
-    usleep(100000);
-}
-
-sub read_key {
-    ReadMode 4;
-    my $key = ReadKey(-1);
-    print STDERR "Pressed $key\n" if defined $key;
-    ReadMode 0;
+    usleep(200000);
 }

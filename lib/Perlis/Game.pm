@@ -42,15 +42,19 @@ sub add_shape {
     if ( $self->{active} ) {
         push @{ $self->{frozen_shapes} }, $self->{active};
         $self->{active} = undef;
-    } my @shapes = (
+    }
+    $self->delete_completed_lines();
+    my @shapes = (
         'Perlis::Shape::Bar',
         'Perlis::Shape::Box',
         'Perlis::Shape::L',
-        # 'Perlis::Shape::T',
+        'Perlis::Shape::T',
     );
+
     my $shape_type = $shapes[rand(@shapes)];
     my $shape      = eval "$shape_type->new( \$self->{grid} )";
     $self->{active} = $shape;
+
     return $shape->draw();
 }
 
@@ -62,6 +66,8 @@ sub tick {
         $self->dispatch($key) if defined $key;
     }
 
+    $self->clear();
+    $self->draw_shapes();
     my $success = $self->apply_gravity();
     if ( !$success ) {
         my $added = $self->add_shape();
@@ -71,6 +77,34 @@ sub tick {
     $self->draw_shapes();
 
     return 1;
+}
+
+sub delete_completed_lines {
+    my ($self) = @_;
+
+    my $lowest_deleted_line;
+    for (my $i = 0; $i < $self->{rows}; $i++) {
+        my $rowref = $self->{grid}->[$i];
+        my $out = grep { $_ == 0 } @$rowref;
+        if (!$out) {
+            $self->delete_row($i);
+            $lowest_deleted_line = $i;
+        }
+    }
+    if ($lowest_deleted_line) {
+        $self->consolidate();
+    }
+}
+
+sub delete_row {
+    my ($self, $r) = @_;
+
+    for (my $c = 0; $c < $self->{columns}; $c++) {
+        foreach my $shape ( @{ $self->{frozen_shapes} } ) {
+            $self->{grid}->[$r]->[$c] = 0;
+            $shape->cancel($c, $r);
+        }
+    }
 }
 
 sub attach_listener {
@@ -93,7 +127,7 @@ sub dispatch {
 sub draw_shapes {
     my ($self) = @_;
 
-    $self->{active}->draw();
+    $self->{active}->draw() if $self->{active};
     foreach my $shape ( @{ $self->{frozen_shapes} } ) {
         $shape->draw();
     }
@@ -115,6 +149,25 @@ sub apply_gravity {
     my $active_shape = $self->{active};
     my $success      = $active_shape->down();
     return $success;
+}
+
+sub consolidate {
+    my ($self) = @_;
+
+    $self->clear();
+    $self->draw_shapes();
+    my $moved;
+    do {
+        $moved = 0;
+        foreach my $shape ( @{ $self->{frozen_shapes} } ) {
+            next if $shape->empty;
+
+            my $result = $shape->down();
+            $moved ||= $result;
+            $self->clear();
+            $self->draw_shapes();
+        }
+    } while ($moved);
 }
 
 1;

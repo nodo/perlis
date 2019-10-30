@@ -19,6 +19,18 @@ sub new {
     return $self;
 }
 
+sub cancel {
+    my ($self, $c, $r) = @_;
+
+    my $new_coords;
+    foreach my $coord ( $self->{coords}->@* ) {
+        if ($coord->[0] != $c || $coord->[1] != $r) {
+            push (@$new_coords, $coord);
+        }
+    }
+    $self->{coords} = $new_coords;
+}
+
 sub draw {
     my ($self) = @_;
 
@@ -34,10 +46,26 @@ sub draw {
     return 1;
 }
 
+sub empty {
+    my ($self) = @_;
+
+    if (!$self->{coords} ) {
+        return 1;
+    }
+    if (!@{$self->{coords}}) {
+        return 1;
+    }
+    return 0;
+}
+
 sub down {
     my ($self) = @_;
 
     my $new_coords;
+    my $l = scalar($self->{coords});
+
+    return 0 if $self->empty;
+
     foreach my $coord ( $self->{coords}->@* ) {
         my $c = $coord->[0];
         my $r = $coord->[1];
@@ -48,6 +76,7 @@ sub down {
         }
         push( @$new_coords, $new_coord );
     }
+
     $self->{coords} = $new_coords;
     return 1;
 }
@@ -99,9 +128,9 @@ sub _collision {
     return 1 if ( $r < 0 || $r > scalar(@$grid) - 1 );
     return 1 if ( $c < 0 || $c > scalar( @{ $grid->[0] } ) - 1 );
 
-    return 0 if $self->{grid}->[$r]->[$c] == 0;
+    return 0 if ($self->{grid}->[$r]->[$c] == 0);
 
-    return 0 if $self->_old_coords_contains_new_coord($new_coord);
+    return 0 if ($self->_old_coords_contains_new_coord($new_coord));
 
     return 1;
 }
