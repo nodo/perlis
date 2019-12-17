@@ -22,4 +22,9 @@ sub id {
     return 2;
 }
 
+sub rotate {
+    my ($self) = @_;
+    return;
+}
+
 1;

@@ -121,6 +121,8 @@ sub dispatch {
         $self->{active}->left;
     } elsif ($key eq "d") {
         $self->{active}->right;
+    } elsif ($key eq "s") {
+        $self->{active}->rotate;
     }
 }
 
