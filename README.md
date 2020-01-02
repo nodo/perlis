@@ -1,6 +1,6 @@
 # Perlis
 
-Tetris for your terminal, in Perl.
+Tetris for your terminal with almost no dependencies.
 
 ## TODO
 - [ ] Rotate pieces

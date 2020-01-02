@@ -11,8 +11,8 @@ sub initial_coords {
     return [
         [ $start,   0 ],
         [ $start+1, 0 ],
-        [ $start+1, 1 ],
         [ $start+2, 0 ],
+        [ $start+1, 1 ],
     ];
 }
 
@@ -24,6 +24,27 @@ sub id {
 
 sub rotate {
     my ($self) = @_;
+    $self->{rotation_count} //= 0;
+
+    if ($self->{rotation_count} % 4 == 0) {
+        $self->{coords}->[2][0]--;
+        $self->{coords}->[2][1]--;
+    } elsif ($self->{rotation_count} % 4 == 1) {
+        $self->{coords}->[3][0]++;
+        $self->{coords}->[3][1]--;
+    } elsif ($self->{rotation_count} % 4 == 2) {
+        $self->{coords}->[0][0]++;
+        $self->{coords}->[0][1]++;
+    } else {
+        $self->{coords}->[0][0]--;
+        $self->{coords}->[0][1]--;
+        $self->{coords}->[2][0]++;
+        $self->{coords}->[2][1]++;
+        $self->{coords}->[3][0]--;
+        $self->{coords}->[3][1]++;
+    }
+    $self->{rotation_count}++;
+
     return;
 }
 
