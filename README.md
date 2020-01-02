@@ -2,7 +2,10 @@
 
 Tetris for your terminal with almost no dependencies.
 
-## TODO
-- [ ] Rotate pieces
-- [ ] Count and store points
-- [ ] Package the project into an executable
+# How to play
+
+1. Install `perl`
+1. `git clone https://github.com/nodo/perlis.git`
+1. `cd perlis`
+1. `bin/main.pl`
+1. Use `A` and `D` to move. `S` to rotate.
