@@ -2,6 +2,8 @@
 
 Tetris for your terminal with almost no dependencies.
 
+![screenshot](images/screenshot.png)
+
 # How to play
 
 1. Install `perl`
